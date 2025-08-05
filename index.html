@@ -164,6 +164,10 @@
                         <span class="font-semibold text-sky-400">Min. Fuel Required:</span> 
                         <span id="int1_total_fuel" class="font-mono font-bold text-sky-400">0.0 lbs</span>
                     </div>
+                    <div class="flex justify-between border-t border-sky-700 mt-2 pt-2 text-base">
+                        <span class="font-semibold text-green-400">Sisa Fuel di Int. 1:</span> 
+                        <span id="int1_remaining_fuel" class="font-mono font-bold text-green-400">0.0 lbs</span>
+                    </div>
                 </div>
             </div>
 
@@ -254,6 +258,7 @@
             /** Main calculation function */
             function calculateAllFuel() {
                 const initialFuel = parseFloat(getEl('fuel_onboard').value) || 0;
+                let currentRemainingFuel = initialFuel;
 
                 // --- Direct to Destination Calculation ---
                 const destHours = parseInt(getEl('dest_hours').value) || 0;
@@ -273,58 +278,62 @@
                 remainingEl.classList.toggle('text-green-400', remainingAtDest >= 0);
 
                 // --- Multi-Leg Calculation ---
-                let remainingFuelForLegs = initialFuel;
-
                 // Leg 1
                 const int1Hours = parseInt(getEl('int1_hours').value) || 0;
                 const int1Minutes = parseInt(getEl('int1_minutes').value) || 0;
                 const totalInt1Minutes = (int1Hours * 60) + int1Minutes;
                 
-                let fuelUsedLeg1 = 0;
-                const reserveFuel = RESERVE_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
-                const taxiFuel = TAXI_START_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
-                getEl('int1_reserve_fuel').textContent = formatFuel(reserveFuel);
-                getEl('int1_taxi_fuel').textContent = formatFuel(taxiFuel);
-
+                let tripFuel1 = 0;
+                let contingencyFuel1 = 0;
+                const reserveFuel1 = RESERVE_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
+                const taxiFuel1 = TAXI_START_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
+                
                 if (totalInt1Minutes > 0) {
-                    const tripFuel = totalInt1Minutes * FUEL_RATE_PER_MINUTE;
-                    const contingencyFuel = tripFuel * CONTINGENCY_RATE;
-                    fuelUsedLeg1 = tripFuel + contingencyFuel + reserveFuel + taxiFuel;
-                    getEl('int1_trip_fuel').textContent = formatFuel(tripFuel);
-                    getEl('int1_contingency_fuel').textContent = formatFuel(contingencyFuel);
-                } else {
-                    getEl('int1_trip_fuel').textContent = formatFuel(0);
-                    getEl('int1_contingency_fuel').textContent = formatFuel(0);
+                    tripFuel1 = totalInt1Minutes * FUEL_RATE_PER_MINUTE;
+                    contingencyFuel1 = tripFuel1 * CONTINGENCY_RATE;
                 }
-                getEl('int1_total_fuel').textContent = formatFuel(fuelUsedLeg1);
-                remainingFuelForLegs -= fuelUsedLeg1;
+                
+                const minRequired1 = tripFuel1 + contingencyFuel1 + reserveFuel1 + taxiFuel1;
+                const fuelBurned1 = tripFuel1 + taxiFuel1;
+                currentRemainingFuel -= fuelBurned1;
+
+                getEl('int1_trip_fuel').textContent = formatFuel(tripFuel1);
+                getEl('int1_contingency_fuel').textContent = formatFuel(contingencyFuel1);
+                getEl('int1_reserve_fuel').textContent = formatFuel(reserveFuel1);
+                getEl('int1_taxi_fuel').textContent = formatFuel(taxiFuel1);
+                getEl('int1_total_fuel').textContent = formatFuel(minRequired1);
+                
+                const remaining1El = getEl('int1_remaining_fuel');
+                remaining1El.textContent = formatFuel(currentRemainingFuel);
+                remaining1El.classList.toggle('text-red-500', currentRemainingFuel < 0);
+                remaining1El.classList.toggle('text-green-400', currentRemainingFuel >= 0);
 
                 // Legs 2 to 6
                 for (let i = 2; i <= 6; i++) {
                     const onboardEl = getEl(`int${i}_fuel_onboard`);
-                    onboardEl.textContent = formatFuel(remainingFuelForLegs);
-                    onboardEl.classList.toggle('text-red-500', remainingFuelForLegs < 0);
-                    onboardEl.classList.toggle('text-green-400', remainingFuelForLegs >= 0);
+                    onboardEl.textContent = formatFuel(currentRemainingFuel);
+                    onboardEl.classList.toggle('text-red-500', currentRemainingFuel < 0);
+                    onboardEl.classList.toggle('text-green-400', currentRemainingFuel >= 0);
 
                     const hours = parseInt(getEl(`int${i}_hours`).value) || 0;
                     const minutes = parseInt(getEl(`int${i}_minutes`).value) || 0;
                     const totalMinutes = (hours * 60) + minutes;
                     
-                    let fuelUsedThisLeg = 0;
-                    const taxiFuelLegN = TAXI_START_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
-                    getEl(`int${i}_taxi_fuel`).textContent = formatFuel(taxiFuelLegN);
-
+                    let tripFuelN = 0;
+                    const taxiFuelN = TAXI_START_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
                     if (totalMinutes > 0) {
-                        const tripFuel = totalMinutes * FUEL_RATE_PER_MINUTE;
-                        fuelUsedThisLeg = tripFuel + taxiFuelLegN;
-                        getEl(`int${i}_trip_fuel`).textContent = formatFuel(tripFuel);
-                    } else {
-                        getEl(`int${i}_trip_fuel`).textContent = formatFuel(0);
+                        tripFuelN = totalMinutes * FUEL_RATE_PER_MINUTE;
                     }
                     
-                    getEl(`int${i}_total_fuel`).textContent = formatFuel(fuelUsedThisLeg);
+                    const minRequiredN = tripFuelN + taxiFuelN;
+                    const fuelBurnedN = tripFuelN + taxiFuelN;
+
+                    getEl(`int${i}_trip_fuel`).textContent = formatFuel(tripFuelN);
+                    getEl(`int${i}_taxi_fuel`).textContent = formatFuel(taxiFuelN);
+                    getEl(`int${i}_total_fuel`).textContent = formatFuel(minRequiredN);
+
                     if (totalMinutes > 0) {
-                       remainingFuelForLegs -= fuelUsedThisLeg;
+                       currentRemainingFuel -= fuelBurnedN;
                     }
                 }
             }
