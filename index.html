@@ -207,8 +207,8 @@
                                     <span id="int${i}_total_fuel" class="font-mono font-bold text-amber-400">0.0 lbs</span>
                                 </div>
                                 <div class="flex justify-between border-t border-sky-700 mt-2 pt-2 text-base">
-                                    <span class="font-semibold text-green-400">Fuel Onboard at Start:</span> 
-                                    <span id="int${i}_fuel_onboard" class="font-mono font-bold text-green-400">0.0 lbs</span>
+                                    <span class="font-semibold text-green-400">Sisa Fuel di Int. ${i}:</span> 
+                                    <span id="int${i}_remaining_fuel" class="font-mono font-bold text-green-400">0.0 lbs</span>
                                 </div>
                             </div>
                         </div>
@@ -234,6 +234,11 @@
                     return '0.0 lbs';
                 }
                 return `${value.toFixed(1)} lbs`;
+            };
+            const updateFuelDisplay = (el, value) => {
+                el.textContent = formatFuel(value);
+                el.classList.toggle('text-red-500', value < 0);
+                el.classList.toggle('text-green-400', value >= 0);
             };
 
             // --- DOM Elements & Event Listeners ---
@@ -272,69 +277,58 @@
                     fuelConsumedDirect = tripFuelToDest + taxiFuelOnly;
                 }
                 const remainingAtDest = initialFuel - fuelConsumedDirect;
-                const remainingEl = getEl('dest_remaining_fuel');
-                remainingEl.textContent = formatFuel(remainingAtDest);
-                remainingEl.classList.toggle('text-red-500', remainingAtDest < 0);
-                remainingEl.classList.toggle('text-green-400', remainingAtDest >= 0);
+                updateFuelDisplay(getEl('dest_remaining_fuel'), remainingAtDest);
 
-                // --- Multi-Leg Calculation ---
+                // --- Multi-Leg Calculation (Corrected Logic) ---
                 // Leg 1
                 const int1Hours = parseInt(getEl('int1_hours').value) || 0;
                 const int1Minutes = parseInt(getEl('int1_minutes').value) || 0;
                 const totalInt1Minutes = (int1Hours * 60) + int1Minutes;
                 
                 let tripFuel1 = 0;
-                let contingencyFuel1 = 0;
+                if (totalInt1Minutes > 0) {
+                    tripFuel1 = totalInt1Minutes * FUEL_RATE_PER_MINUTE;
+                }
+                const contingencyFuel1 = tripFuel1 * CONTINGENCY_RATE;
                 const reserveFuel1 = RESERVE_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
                 const taxiFuel1 = TAXI_START_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
                 
-                if (totalInt1Minutes > 0) {
-                    tripFuel1 = totalInt1Minutes * FUEL_RATE_PER_MINUTE;
-                    contingencyFuel1 = tripFuel1 * CONTINGENCY_RATE;
-                }
-                
                 const minRequired1 = tripFuel1 + contingencyFuel1 + reserveFuel1 + taxiFuel1;
                 const fuelBurned1 = tripFuel1 + taxiFuel1;
-                currentRemainingFuel -= fuelBurned1;
-
+                
                 getEl('int1_trip_fuel').textContent = formatFuel(tripFuel1);
                 getEl('int1_contingency_fuel').textContent = formatFuel(contingencyFuel1);
                 getEl('int1_reserve_fuel').textContent = formatFuel(reserveFuel1);
                 getEl('int1_taxi_fuel').textContent = formatFuel(taxiFuel1);
                 getEl('int1_total_fuel').textContent = formatFuel(minRequired1);
                 
-                const remaining1El = getEl('int1_remaining_fuel');
-                remaining1El.textContent = formatFuel(currentRemainingFuel);
-                remaining1El.classList.toggle('text-red-500', currentRemainingFuel < 0);
-                remaining1El.classList.toggle('text-green-400', currentRemainingFuel >= 0);
+                const remainingAfterLeg1 = initialFuel - fuelBurned1;
+                updateFuelDisplay(getEl('int1_remaining_fuel'), remainingAfterLeg1);
+                
+                currentRemainingFuel = remainingAfterLeg1;
 
                 // Legs 2 to 6
                 for (let i = 2; i <= 6; i++) {
-                    const onboardEl = getEl(`int${i}_fuel_onboard`);
-                    onboardEl.textContent = formatFuel(currentRemainingFuel);
-                    onboardEl.classList.toggle('text-red-500', currentRemainingFuel < 0);
-                    onboardEl.classList.toggle('text-green-400', currentRemainingFuel >= 0);
-
                     const hours = parseInt(getEl(`int${i}_hours`).value) || 0;
                     const minutes = parseInt(getEl(`int${i}_minutes`).value) || 0;
                     const totalMinutes = (hours * 60) + minutes;
                     
                     let tripFuelN = 0;
-                    const taxiFuelN = TAXI_START_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
                     if (totalMinutes > 0) {
                         tripFuelN = totalMinutes * FUEL_RATE_PER_MINUTE;
                     }
-                    
+                    const taxiFuelN = TAXI_START_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
                     const minRequiredN = tripFuelN + taxiFuelN;
                     const fuelBurnedN = tripFuelN + taxiFuelN;
 
                     getEl(`int${i}_trip_fuel`).textContent = formatFuel(tripFuelN);
                     getEl(`int${i}_taxi_fuel`).textContent = formatFuel(taxiFuelN);
                     getEl(`int${i}_total_fuel`).textContent = formatFuel(minRequiredN);
-
+                    
                     if (totalMinutes > 0) {
                        currentRemainingFuel -= fuelBurnedN;
                     }
+                    updateFuelDisplay(getEl(`int${i}_remaining_fuel`), currentRemainingFuel);
                 }
             }
 
