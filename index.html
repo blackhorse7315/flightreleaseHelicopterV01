@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Leg Flight Release Calculator - Bell 412 EP PK-TWV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* bg-slate-900 */
+        }
+        /* Custom styles for better number input appearance */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        /* Adjust grid for larger screens */
+        @media (min-width: 768px) {
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 1280px) {
+            .card-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .input-group {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b; /* text-slate-500 */
+        }
+        .input-field {
+            padding-left: 2.5rem !important;
+        }
+    </style>
+</head>
+<body class="text-slate-200 flex items-center justify-center min-h-screen p-4 md:p-6">
+
+    <div class="w-full max-w-screen-2xl bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-8">
+
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row items-center justify-between mb-8 border-b border-slate-700 pb-6">
+            <div class="flex items-center gap-4">
+                <!-- Helicopter Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" class="text-sky-400">
+                    <path fill="currentColor" d="M12 2c-4.42 0-8 3.58-8 8s3.58 8 8 8s8-3.58 8-8s-3.58-8-8-8m-3.5 12.5L6 14l-2 1.5l.5-2.5L3 11.5l2.5-.25L6 9l.5 2.25L9 11.5l-1.5 1.5zm5.5-1.5l-2.5.5L9 13l2-1.5l-1-2.5l2.25-.5L13 6l.25 2.5l2.25 1l-2 1.25zm3.5 2l-2.5-.5L14 14l2 1.5l-.5 2.5l1.5 1.5l.25-2.5L20 16l-2.25-.5Z"/>
+                </svg>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-white">Flight Release Calculator</h1>
+                    <p class="text-slate-400 text-lg">Bell 412 EP <span class="font-semibold text-sky-400">PK-TWV</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="card-grid">
+
+            <!-- Card: Initial Setup -->
+            <div class="space-y-4 bg-slate-900/50 p-5 rounded-lg border border-slate-700">
+                 <h2 class="text-xl font-semibold text-white flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-sky-400"><path fill="currentColor" d="M3 18v-2h18v2zm0-5v-2h18v2zm0-5V6h18v2z"/></svg>
+                    Initial Setup
+                 </h2>
+                <div class="space-y-4 pt-2">
+                    <div class="input-group">
+                        <span class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M8 7.5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v5.82l-1.74-1.45a1 1 0 0 0-1.23.07l-1.1 1.16l-1.93-1.93a1 1 0 0 0-1.41 0L8 12.1V7.5zM4 5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v14a3 3 0 0 1-3-3H7a3 3 0 0 1-3-3zm3-1a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"/></svg>
+                        </span>
+                        <input type="number" id="fuel_onboard" placeholder="Initial Fuel Onboard (lbs)" class="input-field w-full bg-slate-700 border border-slate-600 rounded-md p-2 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
+                    </div>
+                    <div class="input-group">
+                         <span class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 11.5A2.5 2.5 0 0 1 9.5 9A2.5 2.5 0 0 1 12 6.5A2.5 2.5 0 0 1 14.5 9a2.5 2.5 0 0 1-2.5 2.5M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7"/></svg>
+                        </span>
+                        <input type="text" id="from" placeholder="Origin (e.g., WAHH)" class="input-field w-full bg-slate-700 border border-slate-600 rounded-md p-2 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Direct to Destination -->
+            <div class="space-y-4 bg-slate-900/50 p-5 rounded-lg border border-slate-700">
+                <h2 class="text-xl font-semibold text-white flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-sky-400"><path fill="currentColor" d="m13 16.5l6-6l-3.5-3.5l-6 6V16.5m5.9-8.4c.3-.3.3-.8 0-1.1l-2.1-2.1c-.3-.3-.8-.3-1.1 0l-1.2 1.2l3.2 3.2zM3 21v-4.5l8.4-8.4l4.5 4.5l-8.4 8.4z"/></svg>
+                    Direct to Destination
+                </h2>
+                <div class="space-y-4">
+                    <div class="input-group">
+                        <span class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12q.825 0 1.413-.587T14 10q0-.825-.587-1.413T12 8q-.825 0-1.413.587T10 10q0 .825.587 1.413T12 12m0 10q-4.025-3.425-6.012-6.362T4 10.2q0-3.75 2.413-5.975T12 2q3.175 0 5.588 2.225T20 10.2q0 2.5-1.988 5.438T12 22"/></svg>
+                        </span>
+                        <input type="text" id="final_destination" placeholder="Final Destination" class="input-field w-full bg-slate-700 border border-slate-600 rounded-md p-2">
+                    </div>
+                    <div class="input-group">
+                         <span class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7z"/></svg>
+                        </span>
+                        <div class="flex items-center gap-2 pl-10">
+                            <input type="number" id="dest_hours" placeholder="HH" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 text-center">
+                            <span class="text-slate-500 font-bold">:</span>
+                            <input type="number" id="dest_minutes" placeholder="MM" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 text-center">
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-2 text-sm pt-2">
+                     <div class="flex justify-between border-t border-slate-700 mt-2 pt-2 text-base">
+                        <span class="font-semibold text-green-400 flex items-center gap-2">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M17 4h-1v-.5a.5.5 0 0 0-1 0V4H9v-.5a.5.5 0 0 0-1 0V4H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2m-8.5 2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5m3 0a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5m3 0a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5M7 18.5a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 1 0v7a.5.5 0 0 1-.5.5"/></svg>
+                           Sisa Fuel di Tujuan:
+                        </span> 
+                        <span id="dest_remaining_fuel" class="font-mono font-bold text-green-400">0.0 lbs</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Leg 1 -->
+            <div class="space-y-4 bg-slate-900/50 p-5 rounded-lg border border-slate-700">
+                <h2 class="text-xl font-semibold text-white flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-sky-400"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m-1 14H9V8h2zm4 0h-2V8h2z"/></svg>
+                    Leg 1
+                </h2>
+                <div class="space-y-4">
+                    <div class="input-group">
+                        <span class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="m12 13.1l-5-2.5V13l5 2.5l5-2.5v-2.4l-5 2.5m0-10.6C6.48 2.5 2 6.48 2 11.5c0 4.14 3.05 7.62 7 8.82V22l3-2l3 2v-1.68c3.95-1.2 7-4.68 7-8.82c0-5.02-4.48-9-10-9"/></svg>
+                        </span>
+                        <input type="text" id="intermediate_1" placeholder="To Intermediate 1" class="input-field w-full bg-slate-700 border border-slate-600 rounded-md p-2">
+                    </div>
+                    <div class="input-group">
+                         <span class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7z"/></svg>
+                        </span>
+                        <div class="flex items-center gap-2 pl-10">
+                            <input type="number" id="int1_hours" placeholder="HH" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 text-center">
+                            <span class="text-slate-500 font-bold">:</span>
+                            <input type="number" id="int1_minutes" placeholder="MM" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 text-center">
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-2 text-sm pt-2">
+                    <div class="flex justify-between items-center"><span class="text-slate-400 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 5.5A3.5 3.5 0 0 1 15.5 9a3.5 3.5 0 0 1-3.5 3.5A3.5 3.5 0 0 1 8.5 9A3.5 3.5 0 0 1 12 5.5M5 8c0-3.87 3.13-7 7-7s7 3.13 7 7c0 1.6-.54 3.08-1.44 4.28L12 23L6.44 12.28A6.93 6.93 0 0 1 5 8"/></svg>Trip Fuel</span> <span id="int1_trip_fuel" class="font-mono font-medium">0.0 lbs</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-400 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M13 14h-2V8h2zm-1-10C6.48 4 2 8.48 2 14s4.48 10 10 10s10-4.48 10-10S17.52 4 12 4m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8"/></svg>Contingency (10%)</span> <span id="int1_contingency_fuel" class="font-mono font-medium">0.0 lbs</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-400 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M7 21H5V3h2zm5-18h-2v18h2zm5 0h-2v18h2zM3 3v18H1V3zm18 0v18h2V3z"/></svg>Reserve (20 min)</span> <span id="int1_reserve_fuel" class="font-mono font-medium">0.0 lbs</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-400 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9s9-4.03 9-9s-4.03-9-9-9m3.22 6.72L11 14V8h1.5v5.08l3.72-3.72z"/></svg>Taxi & Start (10 min)</span> <span id="int1_taxi_fuel" class="font-mono font-medium">0.0 lbs</span></div>
+                    <div class="flex justify-between border-t border-slate-700 mt-2 pt-2 text-base">
+                        <span class="font-semibold text-sky-400">Min. Fuel Required:</span> 
+                        <span id="int1_total_fuel" class="font-mono font-bold text-sky-400">0.0 lbs</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Legs 2 to 6 -->
+            <script>
+                const mainGrid = document.querySelector('.card-grid');
+                for (let i = 2; i <= 6; i++) {
+                    const cardHTML = `
+                        <div class="space-y-4 bg-slate-900/50 p-5 rounded-lg border border-slate-700">
+                            <h2 class="text-xl font-semibold text-white flex items-center gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-sky-400"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m-1 14H9V8h2zm4 0h-2V8h2z"/></svg>
+                                Leg ${i}
+                            </h2>
+                            <div class="space-y-4">
+                                <div class="input-group">
+                                    <span class="input-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 11.5A2.5 2.5 0 0 1 9.5 9A2.5 2.5 0 0 1 12 6.5A2.5 2.5 0 0 1 14.5 9a2.5 2.5 0 0 1-2.5 2.5M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7"/></svg></span>
+                                    <input type="text" id="from_intermediate_${i}" placeholder="From..." class="input-field w-full bg-slate-700/50 border border-slate-600 rounded-md p-2" readonly>
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="m12 13.1l-5-2.5V13l5 2.5l5-2.5v-2.4l-5 2.5m0-10.6C6.48 2.5 2 6.48 2 11.5c0 4.14 3.05 7.62 7 8.82V22l3-2l3 2v-1.68c3.95-1.2 7-4.68 7-8.82c0-5.02-4.48-9-10-9"/></svg></span>
+                                    <input type="text" id="intermediate_${i}" placeholder="To Intermediate ${i}" class="input-field w-full bg-slate-700 border border-slate-600 rounded-md p-2">
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7z"/></svg></span>
+                                    <div class="flex items-center gap-2 pl-10">
+                                        <input type="number" id="int${i}_hours" placeholder="HH" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 text-center">
+                                        <span class="text-slate-500 font-bold">:</span>
+                                        <input type="number" id="int${i}_minutes" placeholder="MM" class="w-full bg-slate-700 border border-slate-600 rounded-md p-2 text-center">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-2 text-sm pt-2">
+                                <div class="flex justify-between items-center"><span class="text-slate-400 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 5.5A3.5 3.5 0 0 1 15.5 9a3.5 3.5 0 0 1-3.5 3.5A3.5 3.5 0 0 1 8.5 9A3.5 3.5 0 0 1 12 5.5M5 8c0-3.87 3.13-7 7-7s7 3.13 7 7c0 1.6-.54 3.08-1.44 4.28L12 23L6.44 12.28A6.93 6.93 0 0 1 5 8"/></svg>Trip Fuel</span> <span id="int${i}_trip_fuel" class="font-mono font-medium">0.0 lbs</span></div>
+                                <div class="flex justify-between items-center"><span class="text-slate-400 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9s9-4.03 9-9s-4.03-9-9-9m3.22 6.72L11 14V8h1.5v5.08l3.72-3.72z"/></svg>Taxi & Start (10 min)</span> <span id="int${i}_taxi_fuel" class="font-mono font-medium">0.0 lbs</span></div>
+                                <div class="flex justify-between border-t border-slate-700 mt-2 pt-2 text-base">
+                                    <span class="font-semibold text-amber-400">Min. Fuel Required:</span> 
+                                    <span id="int${i}_total_fuel" class="font-mono font-bold text-amber-400">0.0 lbs</span>
+                                </div>
+                                <div class="flex justify-between border-t border-sky-700 mt-2 pt-2 text-base">
+                                    <span class="font-semibold text-green-400">Fuel Onboard at Start:</span> 
+                                    <span id="int${i}_fuel_onboard" class="font-mono font-bold text-green-400">0.0 lbs</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    mainGrid.insertAdjacentHTML('beforeend', cardHTML);
+                }
+            </script>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Constants ---
+            const FUEL_RATE_PER_MINUTE = 12.5; // lbs/min
+            const RESERVE_TIME_MINUTES = 20;
+            const TAXI_START_TIME_MINUTES = 10;
+            const CONTINGENCY_RATE = 0.10; // 10%
+
+            // --- Helper Functions ---
+            const getEl = (id) => document.getElementById(id);
+            const formatFuel = (value) => {
+                if (isNaN(value) || !isFinite(value)) {
+                    return '0.0 lbs';
+                }
+                return `${value.toFixed(1)} lbs`;
+            };
+
+            // --- DOM Elements & Event Listeners ---
+            const allInputs = [
+                getEl('fuel_onboard'),
+                getEl('final_destination'),
+                getEl('dest_hours'),
+                getEl('dest_minutes')
+            ];
+            
+            for (let i = 1; i <= 6; i++) {
+                if (i < 6) {
+                    const fromEl = getEl(`intermediate_${i}`);
+                    const toEl = getEl(`from_intermediate_${i + 1}`);
+                    if (fromEl && toEl) {
+                        fromEl.addEventListener('input', (e) => { toEl.value = e.target.value; });
+                    }
+                }
+                allInputs.push(getEl(`int${i}_hours`), getEl(`int${i}_minutes`), getEl(`intermediate_${i}`));
+            }
+
+            /** Main calculation function */
+            function calculateAllFuel() {
+                const initialFuel = parseFloat(getEl('fuel_onboard').value) || 0;
+
+                // --- Direct to Destination Calculation ---
+                const destHours = parseInt(getEl('dest_hours').value) || 0;
+                const destMinutes = parseInt(getEl('dest_minutes').value) || 0;
+                const totalDestMinutes = (destHours * 60) + destMinutes;
+                const taxiFuelOnly = TAXI_START_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
+                
+                let fuelConsumedDirect = 0;
+                if (totalDestMinutes > 0) {
+                    const tripFuelToDest = totalDestMinutes * FUEL_RATE_PER_MINUTE;
+                    fuelConsumedDirect = tripFuelToDest + taxiFuelOnly;
+                }
+                const remainingAtDest = initialFuel - fuelConsumedDirect;
+                const remainingEl = getEl('dest_remaining_fuel');
+                remainingEl.textContent = formatFuel(remainingAtDest);
+                remainingEl.classList.toggle('text-red-500', remainingAtDest < 0);
+                remainingEl.classList.toggle('text-green-400', remainingAtDest >= 0);
+
+                // --- Multi-Leg Calculation ---
+                let remainingFuelForLegs = initialFuel;
+
+                // Leg 1
+                const int1Hours = parseInt(getEl('int1_hours').value) || 0;
+                const int1Minutes = parseInt(getEl('int1_minutes').value) || 0;
+                const totalInt1Minutes = (int1Hours * 60) + int1Minutes;
+                
+                let fuelUsedLeg1 = 0;
+                const reserveFuel = RESERVE_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
+                const taxiFuel = TAXI_START_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
+                getEl('int1_reserve_fuel').textContent = formatFuel(reserveFuel);
+                getEl('int1_taxi_fuel').textContent = formatFuel(taxiFuel);
+
+                if (totalInt1Minutes > 0) {
+                    const tripFuel = totalInt1Minutes * FUEL_RATE_PER_MINUTE;
+                    const contingencyFuel = tripFuel * CONTINGENCY_RATE;
+                    fuelUsedLeg1 = tripFuel + contingencyFuel + reserveFuel + taxiFuel;
+                    getEl('int1_trip_fuel').textContent = formatFuel(tripFuel);
+                    getEl('int1_contingency_fuel').textContent = formatFuel(contingencyFuel);
+                } else {
+                    getEl('int1_trip_fuel').textContent = formatFuel(0);
+                    getEl('int1_contingency_fuel').textContent = formatFuel(0);
+                }
+                getEl('int1_total_fuel').textContent = formatFuel(fuelUsedLeg1);
+                remainingFuelForLegs -= fuelUsedLeg1;
+
+                // Legs 2 to 6
+                for (let i = 2; i <= 6; i++) {
+                    const onboardEl = getEl(`int${i}_fuel_onboard`);
+                    onboardEl.textContent = formatFuel(remainingFuelForLegs);
+                    onboardEl.classList.toggle('text-red-500', remainingFuelForLegs < 0);
+                    onboardEl.classList.toggle('text-green-400', remainingFuelForLegs >= 0);
+
+                    const hours = parseInt(getEl(`int${i}_hours`).value) || 0;
+                    const minutes = parseInt(getEl(`int${i}_minutes`).value) || 0;
+                    const totalMinutes = (hours * 60) + minutes;
+                    
+                    let fuelUsedThisLeg = 0;
+                    const taxiFuelLegN = TAXI_START_TIME_MINUTES * FUEL_RATE_PER_MINUTE;
+                    getEl(`int${i}_taxi_fuel`).textContent = formatFuel(taxiFuelLegN);
+
+                    if (totalMinutes > 0) {
+                        const tripFuel = totalMinutes * FUEL_RATE_PER_MINUTE;
+                        fuelUsedThisLeg = tripFuel + taxiFuelLegN;
+                        getEl(`int${i}_trip_fuel`).textContent = formatFuel(tripFuel);
+                    } else {
+                        getEl(`int${i}_trip_fuel`).textContent = formatFuel(0);
+                    }
+                    
+                    getEl(`int${i}_total_fuel`).textContent = formatFuel(fuelUsedThisLeg);
+                    if (totalMinutes > 0) {
+                       remainingFuelForLegs -= fuelUsedThisLeg;
+                    }
+                }
+            }
+
+            // --- Attach Event Listeners ---
+            allInputs.forEach(input => {
+                if(input) input.addEventListener('input', calculateAllFuel);
+            });
+
+            // --- Initial Calculation on Load ---
+            calculateAllFuel();
+        });
+    </script>
+</body>
+</html>
